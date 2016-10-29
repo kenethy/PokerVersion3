@@ -8,11 +8,11 @@ import java.io.PrintWriter;
 import java.util.Collections;
 
 /**
- * VERSÃO 2 - POKER 
+ * VERSÃO 3 - POKER 
  * - ALTERADOS ATRIBUTOS DO TIPO BYTE PARA TIPO INT
+ * - INCLUSÃO DE FUNÇÃO SORT PARA ORDENAR AS CARTAS
  * 
  * @author KENEDY FELIPE - MARCOS INACIO
- *
  */
 public class Main {
 
@@ -20,17 +20,18 @@ public class Main {
 	private static PrintWriter out;
 
 	public static void main(String[] args) throws IOException {
-		
+
 		// TEMPO DO PROGRAMA
 		long tempoInicial = System.currentTimeMillis();
 
 		// CRIAÇÃO DOS ARQUIVOS DE LEITURA E ESCRITA
-		in = new BufferedReader(new FileReader("ArquivosEntrada/pokerM.txt"));
-		out = new PrintWriter(new FileWriter("ArquivosEntrada/pokerM_out.txt"));
+		in = new BufferedReader(new FileReader("ArquivosEntrada/pokerK.txt"));
+		out = new PrintWriter(new FileWriter("ArquivosEntrada/pokerK_out.txt"));
 
 		// JOGADORES
 		Player p1 = new Player();
 		Player p2 = new Player();
+		MergeSort mergeSort = new MergeSort();
 
 		String poker = in.readLine();
 		int value;
@@ -53,9 +54,13 @@ public class Main {
 			}
 
 			// ORDENAÇÃO DAS CARTAS DOS JOGADORES
-			Collections.sort(p1.carta, new ComparadorDeCartas());
-			Collections.sort(p2.carta, new ComparadorDeCartas());
-
+			mergeSort.sort(p1.carta);
+			mergeSort.mergeSort();
+			mergeSort.sort(p2.carta);
+			mergeSort.mergeSort();
+			
+			//printJogadores(p1, p2);
+						
 			// EXECUÇÃO DA VERIFICAÇÃO DAS MAÕS DE POKER
 			p1.ranking.rankingMao(p1);
 			p2.ranking.rankingMao(p2);
@@ -64,17 +69,18 @@ public class Main {
 			// LIMPEZA DO ARRAY PARA NOVAS PARTIDAS
 			p1 = new Player();
 			p2 = new Player();
+//			mergeSort = new MergeSort();
 
 			// LEITURA DA PRÓXIMA LINHA DO ARQUIVO
 			poker = in.readLine();
-			
+
 		} while (poker != null);
-		
+
 		out.println(vitoriasP1);
 		out.print(System.currentTimeMillis() - tempoInicial);
 		out.close();
 	}
-	
+
 	// VERIFICAÇÃO DA MÃO VENCEDORA
 	public static int verificaVencedor(Player p1, Player p2) {
 		int cardP1 = (int) p1.mao.get(p1.mao.size() - 1).ordinal();
@@ -85,7 +91,7 @@ public class Main {
 			return 1;
 		else if (cardP1 < cardP2)
 			return 0;
-		
+
 		// VALOR DA CARTA DO RANKING DE MÃOS
 		else if (p1.getCartaRanking() > p2.getCartaRanking())
 			return 1;
@@ -103,10 +109,9 @@ public class Main {
 			return 1;
 		else if (p1.getKicker() < p2.getKicker())
 			return 0;
-		
+
 		// CASO EMPATE
 		return 0;
-
 	}
 
 	// FUNÇÃO PARA ADICIONAR O VALOR REAL DAS CARTAS (A, K, Q, J, T)
@@ -136,7 +141,7 @@ public class Main {
 	}
 
 	// IMPRESSÃO DAS INFORMAÇÕES DOS JOGADORES
-	public static void printJogadores(Player p1, Player p2, PrintWriter out) {
+	public static void printJogadores(Player p1, Player p2) {
 		// JOGADOR 1
 		out.print("Mão Player 1: " + p1.mao.toString() + "\nCartas: ");
 		for (Carta card : p1.carta) {
